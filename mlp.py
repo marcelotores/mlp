@@ -90,15 +90,23 @@ class Mlp():
 
             #print('Erro camada saida', erro_camada_saida)
 
-            #erro_camada_oculta
 
-            derivada = (S2 * (1 - S2))
+            derivada2 = (S2 * (1 - S2))
+            derivada1 = (S1 * (1 - S1))
 
             # Nessa forma, os neuronios são as linhas e as amostras, as colunas
-            print(np.dot(self.pesos_camada_2[1:, :], erro_camada_saida.T))
+            #print(np.dot(self.pesos_camada_2[1:, :], erro_camada_saida.T))
 
             # Oposto
-            print(np.dot(self.pesos_camada_2[1:, :], erro_camada_saida.T).T)
+            #print(np.dot(self.pesos_camada_2[1:, :], erro_camada_saida.T).T)
+            erro_camada_oculta  = np.dot(self.pesos_camada_2[1:, :], erro_camada_saida.T).T
+
+            gradiente1 = erro_camada_oculta * derivada1
+            gradiente2 = erro_camada_saida * derivada2
+
+            print('gradiente 1:', gradiente1)
+            print('gradiente 2:', gradiente2)
+            print('S1:', S1)
 
 
             #gradiente
@@ -119,8 +127,8 @@ class Mlp():
 
             # Atualização dos pesos
             ##self.pesos_camada_2 -= self.taxa_aprendizado * gradiente_peso2 * S2
-            #self.pesos_camada_2[1:, :] -= self.taxa_aprendizado * gradiente_peso2
-            #self.pesos_camada_1[1:, :] -= self.taxa_aprendizado * gradiente_peso1
+            self.pesos_camada_2[1:, :] -= self.taxa_aprendizado * gradiente2 * S2
+            self.pesos_camada_1[1:, :] -= self.taxa_aprendizado * gradiente1
 
             #print('Z2', Z2)
             #print('S2', S2)

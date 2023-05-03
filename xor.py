@@ -15,7 +15,7 @@ print('X', X.shape)
 ## Parâmetros
 taxa_aprendizado = 0.1
 epocas = 1
-qtd_neuronios_camada_oculta = 3
+qtd_neuronios_camada_oculta = 4
 
 qtd_neuronios_camada_saida = 3
 
