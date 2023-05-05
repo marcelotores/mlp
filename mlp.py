@@ -76,16 +76,9 @@ class Mlp():
 
             Z1 = self.funcao_linear(self.pesos_camada_1, X)
             S1 = self.tangente_hiperbolica(Z1)
-            #S1 = self.sigmoide(Z1)
             Z2 = self.funcao_linear(self.pesos_camada_2, S1)
             S2 = self.tangente_hiperbolica(Z2)
-            #S2 = self.sigmoide(Z2)
 
-            ## Erros ##
-            #error = self.custo(S2, y)
-            #errors.append(error)
-            #print('Z1', Z2)
-            #print('S2', S2)
             erro_camada_saida = S2 - y
 
             #print('Erro camada saida', erro_camada_saida)
@@ -111,27 +104,11 @@ class Mlp():
 
             #gradiente
 
-            ## Calcula os Gradientes ##
-
-            # gradiente de saída
-            #delta2 = (S2 - y) * (S2 * (1 - S2))
-
-            #gradiente_peso2 = np.dot(S1.T, delta2)
-
-            #db2 = np.sum(delta2, axis=0)
-
-            # gradiente da camada oculta
-            #delta1 = np.dot(delta2, self.pesos_camada_2[1:, :].T) * (S1 * (1 - S1))
-            #gradiente_peso1 = np.dot(X.T, delta1)
-            #db1 = np.sum(delta1, axis=0)
 
             # Atualização dos pesos
             ##self.pesos_camada_2 -= self.taxa_aprendizado * gradiente_peso2 * S2
             self.pesos_camada_2[1:, :] -= self.taxa_aprendizado * gradiente2 * S2
-            self.pesos_camada_1[1:, :] -= self.taxa_aprendizado * gradiente1
-
-            #print('Z2', Z2)
-            #print('S2', S2)
+            #self.pesos_camada_1[1:, :] -= self.taxa_aprendizado * gradiente1
 
 
             parametros = {
