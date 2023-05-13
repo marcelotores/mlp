@@ -16,26 +16,23 @@ class Mlp():
 
         print(f'######### Inicialialização dos pesos #########')
         print('Camada Oculta: ')
+        print('Pesos: ')
         print(self.pesos_camada_1[1:, :])
+        print('Bias: ')
+        print(self.pesos_camada_1[:1, ])
+
         print('Camdada de Saída')
+        print('Pesos: ')
         print(self.pesos_camada_2[1:, :])
-        #print('bias: ', self.pesos_camada_1[0, :])
+        print('Bias: ')
+        print(self.pesos_camada_2[:1, ])
+
 
     def funcao_linear(self, pesos, dataset):
         return np.dot(dataset, pesos[1:, :]) + pesos[0, :]
 
     def sigmoide(self, soma_dos_pesos):
         return 1 / (1 + np.exp(-soma_dos_pesos))
-
-    def step(self, pesos1):
-        predicao = []
-        for p1 in pesos1:
-            if p1 > 0:
-                predicao.append(1)
-            else:
-                predicao.append(0)
-        arr = np.array(predicao)
-        return arr
 
     def tangente_hiperbolica(self, soma_dos_pesos):
         """Função tangente hiperbólica."""
@@ -72,55 +69,71 @@ class Mlp():
         for _ in range(self.epocas):
             print(f'############ Época {_} ############')
 
-            ## Forward ##
+            for input, target in zip(X, y):
 
-            Z1 = self.funcao_linear(self.pesos_camada_1, X)
-            S1 = self.tangente_hiperbolica(Z1)
-            Z2 = self.funcao_linear(self.pesos_camada_2, S1)
-            S2 = self.tangente_hiperbolica(Z2)
+                # IDA
+                Z1 = self.funcao_linear(self.pesos_camada_1, input)
+                Yh = self.tangente_hiperbolica(Z1)
+                Z2 = self.funcao_linear(self.pesos_camada_2, Yh)
+                Yo = self.tangente_hiperbolica(Z2)
 
-            erro_camada_saida = S2 - y
+                # Erro camada saída
+                eo = target - Yo
 
-            #print('Erro camada saida', erro_camada_saida)
+                # Derivada do Valor previsto da camada de saída
+                #derivada_Yo = ((1 - Yo) ** 2) / 2
+                derivada_Yo = Yo * (1 - Yo)
 
-            #derivada2 = (S2 * (1 - S2))
-            derivada2 = 1 - S2 ** 2
-            #derivada1 = (S1 * (1 - S1))
-            derivada1 = 1 - S1 ** 2
+                # Gradientes locais para cada neuronio da camada de saída
+                gradiente_Yo = derivada_Yo * eo
 
-            # Nessa forma, os neuronios são as linhas e as amostras, as colunas
-            #print(np.dot(self.pesos_camada_2[1:, :], erro_camada_saida.T))
+                #Erro camada oculta
+                eh = np.dot(self.pesos_camada_2[1:, :], gradiente_Yo)
 
-            gradiente2 = erro_camada_saida * derivada2
+                # Derivada do valor previsto da camada oculta
+                #derivada_Yh = ((1 - Yh) ** 2) / 2
+                derivada_Yh = Yh * (1 - Yh)
+                # Gradientes locais para cada neuronio da camada oculta
+                gradiente_Yh = derivada_Yh * eh
 
-            # Oposto
-            #print(np.dot(self.pesos_camada_2[1:, :], erro_camada_saida.T).T)
-            ##erro_camada_oculta  = np.dot(self.pesos_camada_2[1:, :], erro_camada_saida.T).T
-            erro_camada_oculta = np.dot(self.pesos_camada_2[1:, :], gradiente2.T).T
+                ## Atualização dos pesos
 
-            gradiente1 = erro_camada_oculta * derivada1
-            #avggradiente1 = gradiente1.mean(axis=0)
+                self.pesos_camada_2[1:, :] += self.taxa_aprendizado * gradiente_Yo
+                novos_pesos_2 = self.pesos_camada_2[1:, :].T * Yh
+                self.pesos_camada_2[1:, :] = novos_pesos_2.T
+                self.pesos_camada_1[1:, :] += self.taxa_aprendizado * gradiente_Yh
 
+                #self.pesos_camada_2[0, :] += gradiente_Yo
+                #self.pesos_camada_1[0, :] += gradiente_Yh
 
-            print('gradiente 1:', gradiente1)
-            print('gradiente 2:', gradiente2)
-            print('S1:', S1)
-            print('S2:', S2)
-
-
-            #gradiente
+                print(f'Entrada={input}, ground-truth={target}, pred={Yo}')
+                #print(self.pesos_camada_2[1:, :])
 
 
-            # Atualização dos pesos
-            ##self.pesos_camada_2 -= self.taxa_aprendizado * gradiente_peso2 * S2
-            self.pesos_camada_2[1:, :] -= self.taxa_aprendizado * gradiente2 * S2
-            #self.pesos_camada_1[1:, :] -= self.taxa_aprendizado * avggradiente1.reshape(avggradiente1.shape[0], 1).T * S1
-            #print(self.pesos_camada_2[1:, :])
-            #print(self.pesos_camada_1[1:, :])
-            #print('Avg', avggradiente1.reshape(avggradiente1.shape[0], 1).T.shape)
+
             parametros = {
                 "pesos_camada_oculta": self.pesos_camada_1,
                 "pesos_camada_saida": self.pesos_camada_2
             }
 
         return errors, parametros
+
+
+## Rótulos
+y = np.array([[0, 1, 1, 0]]).T
+y_and = np.array([[0, 0, 0, 1]]).T
+X = np.array([[0, 0, 1, 1],
+              [0, 1, 0, 1]]).T
+print('X', X.shape)
+## Parâmetros
+taxa_aprendizado = 0.1
+epocas = 10
+qtd_neuronios_camada_oculta = 2
+
+qtd_neuronios_camada_saida = 1
+
+## Definição de parâmetros
+mlp = Mlp(X, taxa_aprendizado, epocas, qtd_neuronios_camada_oculta, qtd_neuronios_camada_saida)
+
+## Treino
+mlp.treino(X, y_and)
