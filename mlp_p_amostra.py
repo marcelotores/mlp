@@ -56,9 +56,9 @@ class Mlp():
         #S2 = self.step(Z2)
         S2 = self.tangente_hiperbolica(Z2)
         #S2 = self.sigmoide(Z2)
-        return np.where(S2 >= 0.5, 1, 0)
+        #return np.where(S2 >= 0.5, 1, 0)
         #return np.where(S2 <= -0.6, -1, np.where(S2 <= 0.6, 0, 1))
-        #return np.where(S2 <= 0.33, -1, np.where(S2 <= 0.66, 0, 1))
+        return np.where(S2 <= 0.33, -1, np.where(S2 <= 0.66, 0, 1))
 
     def treino(self, X, y):
         ## ~~ Initialize parameters ~~##
@@ -66,6 +66,9 @@ class Mlp():
         ## ~~ storage errors after each iteration ~~##
         errors = []
         print('##################### Treino #####################')
+        p2 = np.array([])
+        p1 = np.array([])
+        eo_p = np.array([])
 
         for _ in range(self.epocas):
             print(f'############ Época {_} ############')
@@ -74,13 +77,15 @@ class Mlp():
 
                 # IDA
                 Z1 = self.funcao_linear(self.pesos_camada_1, input)
-                Yh = self.tangente_hiperbolica(Z1)
+                #Yh = self.tangente_hiperbolica(Z1)
+                Yh = self.sigmoide(Z1)
                 Z2 = self.funcao_linear(self.pesos_camada_2, Yh)
-                Yo = self.tangente_hiperbolica(Z2)
+                Yo = self.sigmoide(Z2)
+                #Yo = self.tangente_hiperbolica(Z2)
 
                 # Erro camada saída
                 eo = target - Yo
-
+                eo_p = np.append(eo_p, eo)
 
                 # Derivada do Valor previsto da camada de saída
                 derivada_Yo = ((1 - Yo) ** 2) / 2
@@ -108,8 +113,16 @@ class Mlp():
                 #self.pesos_camada_2[0, :] += gradiente_Yo
                 #self.pesos_camada_1[0, :] += gradiente_Yh
 
-                print(f'Entrada={input}, ground-truth={target}, pred={Yo}')
+                print(f'Entrada={input}, ground-truth={target}, pred={np.where(Yo <= 0.33, -1, np.where(Yo <= 0.66, 0, 1))}')
+                p2 = np.append(p2, self.pesos_camada_2[1, :])
+                p1 = np.append(p1, self.pesos_camada_2[2, :])
 
+
+                #p1 = np.append(p1, print(self.pesos_camada_2[1:, :]))
+                #p1 = np.append(p1, self.pesos_camada_2[1, :][1])
+                #p2.append(self.pesos_camada_2[1, :][0])
+                #print(self.pesos_camada_2[0, :])
+                #print(pesos_camada_2[0, :])
                 #print('----------- ', input, target, '----------------')
 
                 #print('Z1', Z1)
@@ -122,8 +135,9 @@ class Mlp():
                 #print('----')
                 #print('Pesos Ocultos: ')
                 #print(self.pesos_camada_1[1:, :])
-                #print('Pesos Saída: ')
                 #print(self.pesos_camada_2[1:, :])
+                #print('Pesos Saída: ')
+
 
 
 
@@ -132,30 +146,41 @@ class Mlp():
                 "pesos_camada_saida": self.pesos_camada_2
             }
 
-        return errors, parametros
+        return errors, parametros, p2, p1, eo_p
 
 
 # ## Rótulos
-# y = np.array([[0, 1, 1, 0]]).T
-# y_and = np.array([[0, 0, 0, 1]]).T
-# X = np.array([[0, 0, 1, 1],
-#               [0, 1, 0, 1]]).T
+y = np.array([[-1, 1, 1, -1]]).T
+y_and = np.array([[0, 0, 0, 1]]).T
+X = np.array([[-1, -1, 1, 1],
+               [-1, 1, -1, 1]]).T
 # print('X', X.shape)
 # ## Parâmetros
-# taxa_aprendizado = 0.3
-# epocas = 5000
-# qtd_neuronios_camada_oculta = 2
+taxa_aprendizado = 0.1
+epocas = 5
+qtd_neuronios_camada_oculta = 2
+
+qtd_neuronios_camada_saida = 1
 #
-# qtd_neuronios_camada_saida = 1
+## Definição de parâmetros
 #
-# ## Definição de parâmetros
+# Setando os pesos Iniciais
+qtd_col_dataset = X.shape[1]
+pesos_camada_1 = np.random.uniform(-0.5, 0.5, size=(qtd_col_dataset + 1,  qtd_neuronios_camada_oculta))
+pesos_camada_2 = np.random.uniform(-0.5, 0.5, size=(qtd_neuronios_camada_oculta + 1, qtd_neuronios_camada_saida))
 #
-# # Setando os pesos Iniciais
-# qtd_col_dataset = X.shape[1]
-# pesos_camada_1 = np.random.uniform(-0.5, 0.5, size=(qtd_col_dataset + 1,  qtd_neuronios_camada_oculta))
-# pesos_camada_2 = np.random.uniform(-0.5, 0.5, size=(qtd_neuronios_camada_oculta + 1, qtd_neuronios_camada_saida))
+mlp = Mlp(X, taxa_aprendizado, epocas, qtd_neuronios_camada_oculta, qtd_neuronios_camada_saida, pesos_camada_1, pesos_camada_2)
 #
-# mlp = Mlp(X, taxa_aprendizado, epocas, qtd_neuronios_camada_oculta, qtd_neuronios_camada_saida, pesos_camada_1, pesos_camada_2)
-#
-# ## Treino
-# mlp.treino(X, y)
+## Treino
+#########errors, parametros, p2, p1, eo_p = mlp.treino(X, y)
+#print(p2)
+import matplotlib.pyplot as plt
+#xpoints = np.array([0, 10])
+#####ypoints = np.array(p2)
+#####yypoints = np.array(p1)
+#####erro = np.array(eo_p)
+#####print(erro)
+#####plt.plot(erro)
+#plt.plot(ypoints)
+#plt.plot(yypoints)
+#####plt.show()
