@@ -15,6 +15,7 @@ classe1_classe2 = np.concatenate((classe1, classe2), axis=0)
 #processados = np.round(classe1_classe2[0:138, 1], 9)
 #print(classe1_classe2[:, :24])
 
+
 treino2, teste2 = ut.divide_dados_treino_teste(classe1_classe2, 0.7)
 
 
