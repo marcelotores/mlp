@@ -9,10 +9,18 @@ pesos = np.array([
     [0.296582, 0.17906579, 0.20579868, 0.24060917, 0.18372743]
 ])
 Yh = np.array([-0.26719822,  0.13125259,  0.12430141, -0.21210124, -0.17600597])
-print(pesos.shape)
-print(Yh.shape)
-pesos = pesos * Yh
-print(pesos)
+
+#Z1 [-0.2201583  -0.44502779]
+#Yh [-0.21666894 -0.41780329]
+
+#Z2 [0.28774294]
+#Yo [0.2800561]
+
+print(np.tanh(0.28774294))
+#print(pesos.shape)
+#print(Yh.shape)
+#pesos = pesos * Yh
+#print(pesos)
 
 #eh = np.dot(self.pesos_camada_2[1:, :], gradiente_Yo)
 #gradiente

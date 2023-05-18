@@ -1,7 +1,7 @@
 import numpy as np
 
 class Mlp():
-    def __init__(self, dataset, taxa_aprendizado=0.1, epocas=10, qtd_neuronios_camada_oculta=1, qtd_neuronios_camada_saida=1):
+    def __init__(self, dataset, taxa_aprendizado=0.1, epocas=10, qtd_neuronios_camada_oculta=1, qtd_neuronios_camada_saida=1, pesos_camada_1=None, pesos_camada_2=None):
 
         self.taxa_aprendizado = taxa_aprendizado
         self.epocas = epocas
@@ -10,9 +10,10 @@ class Mlp():
 
         qtd_col_dataset = dataset.shape[1]
         #choice(5, 3)
-
-        self.pesos_camada_1 = np.random.uniform(-0.5, 0.5, size=(qtd_col_dataset + 1,  self.qtd_neuronios_camada_oculta))
-        self.pesos_camada_2 = np.random.uniform(-0.5, 0.5, size=(self.qtd_neuronios_camada_oculta + 1, self.qtd_neuronios_camada_saida))
+        self.pesos_camada_1 = pesos_camada_1
+        self.pesos_camada_2 = pesos_camada_2
+        #self.pesos_camada_1 = np.random.uniform(-0.5, 0.5, size=(qtd_col_dataset + 1,  self.qtd_neuronios_camada_oculta))
+        #self.pesos_camada_2 = np.random.uniform(-0.5, 0.5, size=(self.qtd_neuronios_camada_oculta + 1, self.qtd_neuronios_camada_saida))
 
         print(f'######### Inicialialização dos pesos #########')
         print('Camada Oculta: ')
@@ -80,9 +81,10 @@ class Mlp():
                 # Erro camada saída
                 eo = target - Yo
 
+
                 # Derivada do Valor previsto da camada de saída
-                #derivada_Yo = ((1 - Yo) ** 2) / 2
-                derivada_Yo = Yo * (1 - Yo)
+                derivada_Yo = ((1 - Yo) ** 2) / 2
+                #derivada_Yo = Yo * (1 - Yo)
 
                 # Gradientes locais para cada neuronio da camada de saída
                 gradiente_Yo = derivada_Yo * eo
@@ -107,6 +109,20 @@ class Mlp():
                 #self.pesos_camada_1[0, :] += gradiente_Yh
 
                 print(f'Entrada={input}, ground-truth={target}, pred={Yo}')
+
+                #print('----------- ', input, target, '----------------')
+
+                #print('Z1', Z1)
+                #print('Yh', Yh)
+                #print('Z2', Z2)
+                #print('Yo', Yo)
+                #print('eo: ', eo)
+                #print('derivada_Yo: ', derivada_Yo)
+                #print('gradiente_Yo', gradiente_Yo)
+                #print('----')
+                #print('Pesos Ocultos: ')
+                #print(self.pesos_camada_1[1:, :])
+                #print('Pesos Saída: ')
                 #print(self.pesos_camada_2[1:, :])
 
 
@@ -126,14 +142,20 @@ X = np.array([[0, 0, 1, 1],
               [0, 1, 0, 1]]).T
 print('X', X.shape)
 ## Parâmetros
-taxa_aprendizado = 0.1
-epocas = 10
+taxa_aprendizado = 0.3
+epocas = 5000
 qtd_neuronios_camada_oculta = 2
 
 qtd_neuronios_camada_saida = 1
 
 ## Definição de parâmetros
-mlp = Mlp(X, taxa_aprendizado, epocas, qtd_neuronios_camada_oculta, qtd_neuronios_camada_saida)
+
+# Setando os pesos Iniciais
+qtd_col_dataset = X.shape[1]
+pesos_camada_1 = np.random.uniform(-0.5, 0.5, size=(qtd_col_dataset + 1,  qtd_neuronios_camada_oculta))
+pesos_camada_2 = np.random.uniform(-0.5, 0.5, size=(qtd_neuronios_camada_oculta + 1, qtd_neuronios_camada_saida))
+
+mlp = Mlp(X, taxa_aprendizado, epocas, qtd_neuronios_camada_oculta, qtd_neuronios_camada_saida, pesos_camada_1, pesos_camada_2)
 
 ## Treino
-mlp.treino(X, y_and)
+mlp.treino(X, y)
