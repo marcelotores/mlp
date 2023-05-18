@@ -135,27 +135,27 @@ class Mlp():
         return errors, parametros
 
 
-## Rótulos
-y = np.array([[0, 1, 1, 0]]).T
-y_and = np.array([[0, 0, 0, 1]]).T
-X = np.array([[0, 0, 1, 1],
-              [0, 1, 0, 1]]).T
-print('X', X.shape)
-## Parâmetros
-taxa_aprendizado = 0.3
-epocas = 5000
-qtd_neuronios_camada_oculta = 2
-
-qtd_neuronios_camada_saida = 1
-
-## Definição de parâmetros
-
-# Setando os pesos Iniciais
-qtd_col_dataset = X.shape[1]
-pesos_camada_1 = np.random.uniform(-0.5, 0.5, size=(qtd_col_dataset + 1,  qtd_neuronios_camada_oculta))
-pesos_camada_2 = np.random.uniform(-0.5, 0.5, size=(qtd_neuronios_camada_oculta + 1, qtd_neuronios_camada_saida))
-
-mlp = Mlp(X, taxa_aprendizado, epocas, qtd_neuronios_camada_oculta, qtd_neuronios_camada_saida, pesos_camada_1, pesos_camada_2)
-
-## Treino
-mlp.treino(X, y)
+# ## Rótulos
+# y = np.array([[0, 1, 1, 0]]).T
+# y_and = np.array([[0, 0, 0, 1]]).T
+# X = np.array([[0, 0, 1, 1],
+#               [0, 1, 0, 1]]).T
+# print('X', X.shape)
+# ## Parâmetros
+# taxa_aprendizado = 0.3
+# epocas = 5000
+# qtd_neuronios_camada_oculta = 2
+#
+# qtd_neuronios_camada_saida = 1
+#
+# ## Definição de parâmetros
+#
+# # Setando os pesos Iniciais
+# qtd_col_dataset = X.shape[1]
+# pesos_camada_1 = np.random.uniform(-0.5, 0.5, size=(qtd_col_dataset + 1,  qtd_neuronios_camada_oculta))
+# pesos_camada_2 = np.random.uniform(-0.5, 0.5, size=(qtd_neuronios_camada_oculta + 1, qtd_neuronios_camada_saida))
+#
+# mlp = Mlp(X, taxa_aprendizado, epocas, qtd_neuronios_camada_oculta, qtd_neuronios_camada_saida, pesos_camada_1, pesos_camada_2)
+#
+# ## Treino
+# mlp.treino(X, y)
